@@ -3,8 +3,6 @@ package chatroom
 import (
   "bufio"
   "net"
-  //"strings"
-  //"fmt"
 )
 
 type Client struct {

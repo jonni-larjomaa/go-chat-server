@@ -80,8 +80,6 @@ func (cr *ChatRoom) ClientListener(cli *Client) {
       return
     }
 
-    fmt.Printf("Client: %d, Message: %s\n", cli.id, msg)
-
     sms := strings.Split(strings.TrimSpace(msg), " ")
 
     if sms[0] == "getid" {
