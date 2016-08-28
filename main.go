@@ -1,31 +1,17 @@
 package main
 
 import (
-  "bufio"
   "fmt"
   "net"
+
+  "github.com/jonni-larjomaa/go-chat-server/chatroom"
 )
 
-func clientListener(c net.Conn) {
-  reader := bufio.NewReader(c)
-  writer := bufio.NewWriter(c)
-
-  for {
-    msg, err := reader.ReadString('\n')
-
-    if err != nil {
-      fmt.Println("Connection error, client dropped")
-      c.Close()
-      return
-    }
-
-    writer.WriteString(msg)
-    writer.Flush()
-  }
-
-}
+var cr *chatroom.ChatRoom
 
 func main() {
+
+  cr := chatroom.NewChatRoom()
 
 	listener, _ := net.Listen("tcp", ":9090")
 
@@ -36,6 +22,10 @@ func main() {
       fmt.Println("new connection accepted")
     }
 
-		go clientListener(conn)
+    client := chatroom.NewClient(conn, cr.GetFreeId())
+
+    cr.AddClient(client)
+
+		go cr.ClientListener(client)
 	}
 }
