@@ -24,8 +24,8 @@ func NewClient(c net.Conn, id int) *Client {
   return client
 }
 
-func (cli *Client) SendToNamedReceipents(msg string, others []int, hub *ChatRoom){
-  for _, cli := range hub.clients {
+func (cli *Client) SendToNamedReceipents(msg string, others []int, clients []*Client){
+  for _, cli := range clients {
     if inArray(cli.id, others) {
       cli.writer.WriteString(msg)
       cli.writer.Flush()

@@ -75,7 +75,7 @@ func (cr *ChatRoom) ClientListener(cli *Client) {
       case jsonmsg.Cmd == "list":
         cli.EchoToClient(fmt.Sprintf("Client-ids: %v\n", cr.GetClientIds()))
       case jsonmsg.Cmd == "send":
-        cli.SendToNamedReceipents(fmt.Sprintf("Client: %d, Message: %s\n", cli.id, jsonmsg.Msg), jsonmsg.Receiv, cr)
+        cli.SendToNamedReceipents(fmt.Sprintf("Client: %d, Message: %s\n", cli.id, jsonmsg.Msg), jsonmsg.Receiv, cr.clients)
     }
   }
 }
