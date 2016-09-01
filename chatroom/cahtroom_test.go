@@ -13,17 +13,19 @@ func NewMockConn() *MockConn {
   return &MockConn{}
 }
 
-var cr *ChatRoom
-var cli *Client
-
 func TestChatroom(t *testing.T) {
 
   cr := NewChatRoom()
-  cli := NewClient(NewMockConn(), cr.GetFreeId())
+  cliar := make([]*Client,0)
 
-  cr.AddClient(cli)
+  // add ten clients.
+  for i := 0; i < 10; i++ {
+      cli := NewClient(NewMockConn(), cr.GetFreeId())
+      cliar = append(cliar, cli)
+      cr.AddClient(cli)
+  }
 
-  if len(cr.clients) != 1 {
+  if len(cr.clients) != 10 {
     t.Error("Expected client count 1")
   }
 
@@ -31,13 +33,21 @@ func TestChatroom(t *testing.T) {
     t.Error("Expected client with id 1")
   }
 
-  if cr.GetFreeId() != 2 {
-    t.Error("Expected next client id to be 2")
+  if cr.GetFreeId() != 11 {
+    t.Error("Expected next client id to be 11")
   }
 
-  cr.RemoveClient(cli)
+  cr.RemoveClient(cliar[5])
 
-  if len(cr.clients) != 0 {
-    t.Error("Expected client count to be 0")
+  if cr.GetFreeId() != 6 {
+    t.Error("Expected next free id to be 6")
+  }
+
+  if len(cr.clients) != 9 {
+    t.Error("Expected client count to be 9")
+  }
+
+  if cr.inClientArray(1) != true {
+    t.Error("Expected client with id 1 to be in client array")
   }
 }

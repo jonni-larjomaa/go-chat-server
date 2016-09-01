@@ -37,12 +37,3 @@ func (cli *Client) EchoToClient(msg string) {
   cli.writer.WriteString(msg)
   cli.writer.Flush()
 }
-
-func inArray(a int, list []int) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
-}

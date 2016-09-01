@@ -3,7 +3,7 @@ package chatroom
 import (
   "fmt"
   "strings"
-  "strconv"
+  "encoding/json"
 )
 
 type ChatRoom struct {
@@ -25,7 +25,7 @@ func (cr *ChatRoom) AddClient(cli *Client) {
 func (cr *ChatRoom) GetFreeId() int {
 
   for i := 1; i <= len(cr.clients)+1; i++ {
-    if !inClientArray(i, cr.clients) {
+    if !cr.inClientArray(i) {
         return i;
       }
   }
@@ -49,29 +49,9 @@ func (cr *ChatRoom) GetClientIds() []int {
   return ar
 }
 
-func inClientArray(i int, clia []*Client) bool {
-  for _, cli := range clia {
-    if i == cli.id {
-      return true
-    }
-  }
-
-  return false
-}
-
-func toIntSlice(strs []string) []int {
-    list := make([]int, 0)
-
-    for _, str := range strs {
-      num, _ := strconv.ParseInt(str, 10, 0)
-      list = append(list, int(num))
-    }
-
-    return list
-}
-
 func (cr *ChatRoom) ClientListener(cli *Client) {
   for{
+
     msg, err := cli.reader.ReadString('\n')
 
     if err != nil {
@@ -80,23 +60,32 @@ func (cr *ChatRoom) ClientListener(cli *Client) {
       return
     }
 
-    sms := strings.Split(strings.TrimSpace(msg), " ")
+    var jsonmsg Message
 
-    if sms[0] == "getid" {
-      dmsg := fmt.Sprintf("Client-id: %d\n", cli.id)
-      cli.EchoToClient(dmsg)
+    e := json.Unmarshal([]byte(strings.TrimSpace(msg)),&jsonmsg);
+
+    if e != nil {
+      fmt.Println("Error parsing received json")
+      continue;
     }
-    if sms[0] == "list" {
-      dmsg := fmt.Sprintf("Client-ids: %v\n", cr.GetClientIds())
-      cli.EchoToClient(dmsg)
-    }
-    if sms[0] == "send" {
 
-      targets := toIntSlice(strings.Split(sms[1], ","))
-
-      dmsg := fmt.Sprintf("Client: %d, Message: %s\n", cli.id, sms[2])
-
-      cli.SendToNamedReceipents(dmsg, targets, cr)
+    switch {
+    case jsonmsg.Cmd == "getid":
+        cli.EchoToClient(fmt.Sprintf("Client-id: %d\n", cli.id))
+      case jsonmsg.Cmd == "list":
+        cli.EchoToClient(fmt.Sprintf("Client-ids: %v\n", cr.GetClientIds()))
+      case jsonmsg.Cmd == "send":
+        cli.SendToNamedReceipents(fmt.Sprintf("Client: %d, Message: %s\n", cli.id, jsonmsg.Msg), jsonmsg.Receiv, cr)
     }
   }
+}
+
+func (cr *ChatRoom) inClientArray(i int) bool {
+  for _, cli := range cr.clients {
+    if i == cli.id {
+      return true
+    }
+  }
+
+  return false
 }
