@@ -1,5 +1,7 @@
 #go-chat-server the hub for clients
 
+client: github.com/jonni-larjomaa/go-chat-client
+
 usage:
 
 1. go run main.go

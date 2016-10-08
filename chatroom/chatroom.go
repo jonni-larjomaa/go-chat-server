@@ -24,18 +24,18 @@ func (cr *ChatRoom) AddClient(cli *Client) {
 
 func (cr *ChatRoom) GetFreeId() int {
 
-  for i := 1; i <= len(cr.clients)+1; i++ {
-    if !cr.inClientArray(i) {
-        return i;
+  for id := 1; id <= len(cr.clients)+1; id++ {
+    if !cr.inClientArray(id) {
+        return id;
       }
   }
   return 1
 }
 
 func (cr *ChatRoom) RemoveClient(cli *Client) {
-  for i, clia := range cr.clients {
+  for position, clia := range cr.clients {
     if clia.id == cli.id {
-      cr.clients = append(cr.clients[:i], cr.clients[i+1:]...)
+      cr.clients = append(cr.clients[:position], cr.clients[position+1:]...)
     }
   }
 }
@@ -80,9 +80,9 @@ func (cr *ChatRoom) ClientListener(cli *Client) {
   }
 }
 
-func (cr *ChatRoom) inClientArray(i int) bool {
+func (cr *ChatRoom) inClientArray(id int) bool {
   for _, cli := range cr.clients {
-    if i == cli.id {
+    if id == cli.id {
       return true
     }
   }
